@@ -1746,8 +1746,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	}
 	
 	SBUF_LOCK(&rcvvar->read_lock);
-
-	uint32_t previous_rcv_wnd;
+	
 	int copylen;
 
 	copylen = MIN(rcvvar->rcvbuf->merged_len, 2048);
@@ -1985,7 +1984,7 @@ SendProcess(mctx_t mctx, int sockid, int recv_len){
 	}
         /* if waiting for close, notify it if no remaining data */
 	if (cur_stream->state == TCP_ST_CLOSE_WAIT && 
-	    rcvvar->rcvbuf->merged_len == 0 && ret > 0) {
+	    rcvvar->rcvbuf->merged_len == 0 && recv_len > 0) {
 		event_remaining = TRUE;
 	}
 	
@@ -1996,4 +1995,6 @@ SendProcess(mctx_t mctx, int sockid, int recv_len){
 			AddEpollEvent(mtcp->ep, USR_SHADOW_EVENT_QUEUE, socket, MTCP_EPOLLIN);
 		}
 	}
+	
+	return 1;
 }
