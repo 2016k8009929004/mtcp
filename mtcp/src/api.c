@@ -21,6 +21,8 @@
 #define MAX(a, b) ((a)>(b)?(a):(b))
 #define MIN(a, b) ((a)<(b)?(a):(b))
 
+uint32_t previous_rcv_wnd;
+
 /*----------------------------------------------------------------------------*/
 static inline int 
 mtcp_is_connected(mtcp_manager_t mtcp, tcp_stream *cur_stream)
@@ -1690,35 +1692,29 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	socket_map_t socket;
 	tcp_stream *cur_stream;
 	struct tcp_recv_vars *rcvvar;
-	int event_remaining;
-	int ret;
 	
 	mtcp = GetMTCPManager(mctx);
         if (!mtcp) {
-		return -1;
+		return NULL;
 	}
 	
 	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
 		TRACE_API("Socket id %d out of range.\n", sockid);
 		errno = EBADF;
-		return -1;
+		return NULL;
 	}
 	
 	socket = &mtcp->smap[sockid];
         if (socket->socktype == MTCP_SOCK_UNUSED) {
 		TRACE_API("Invalid socket id: %d\n", sockid);
 		errno = EBADF;
-		return -1;
-	}
-	
-	if (socket->socktype == MTCP_SOCK_PIPE) {
-		return PipeRead(mctx, sockid, buf, len);
+		return NULL;
 	}
 	
 	if (socket->socktype != MTCP_SOCK_STREAM) {
 		TRACE_API("Not an end socket. id: %d\n", sockid);
 		errno = ENOTSOCK;
-		return -1;
+		return NULL;
 	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
@@ -1727,7 +1723,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
 	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
 		errno = ENOTCONN;
-		return -1;
+		return NULL;
 	}
 
 	rcvvar = cur_stream->rcvvar;
@@ -1735,38 +1731,38 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	/* if CLOSE_WAIT, return 0 if there is no payload */
 	if (cur_stream->state == TCP_ST_CLOSE_WAIT) {
 		if (!rcvvar->rcvbuf)
-			return 0;
+			return NULL;
 		
 		if (rcvvar->rcvbuf->merged_len == 0)
-			return 0;
+			return NULL;
         }
 	
 	/* return EAGAIN if no receive buffer */
 	if (socket->opts & MTCP_NONBLOCK) {
 		if (!rcvvar->rcvbuf || rcvvar->rcvbuf->merged_len == 0) {
 			errno = EAGAIN;
-			return -1;
+			return NULL;
 		}
 	}
 	
 	SBUF_LOCK(&rcvvar->read_lock);
 
-	uint32_t prev_rcv_wnd;
+	uint32_t previous_rcv_wnd;
 	int copylen;
 
-	copylen = MIN(rcvvar->rcvbuf->merged_len, BUF_SIZE);
+	copylen = MIN(rcvvar->rcvbuf->merged_len, 2048);
 	if (copylen <= 0) {
 		errno = EAGAIN;
-		return -1;
+		return NULL;
 	}
 
-	prev_rcv_wnd = rcvvar->rcv_wnd;
+	previous_rcv_wnd = rcvvar->rcv_wnd;
 
 	*recv_len = copylen;
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
-	return rcvvar->rcvbuf->head;
+	return (char *)(rcvvar->rcvbuf->head);
 }
 
 char * 
@@ -1778,30 +1774,26 @@ GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 	
 	mtcp = GetMTCPManager(mctx);
         if (!mtcp) {
-		return -1;
+		return NULL;
 	}
 	
 	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
 		TRACE_API("Socket id %d out of range.\n", sockid);
 		errno = EBADF;
-		return -1;
+		return NULL;
 	}
 	
 	socket = &mtcp->smap[sockid];
         if (socket->socktype == MTCP_SOCK_UNUSED) {
 		TRACE_API("Invalid socket id: %d\n", sockid);
 		errno = EBADF;
-		return -1;
-	}
-	
-	if (socket->socktype == MTCP_SOCK_PIPE) {
-		return PipeRead(mctx, sockid, buf, len);
+		return NULL;
 	}
 	
 	if (socket->socktype != MTCP_SOCK_STREAM) {
 		TRACE_API("Not an end socket. id: %d\n", sockid);
 		errno = ENOTSOCK;
-		return -1;
+		return NULL;
 	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
@@ -1810,7 +1802,7 @@ GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
 	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
 		errno = ENOTCONN;
-		return -1;
+		return NULL;
 	}
 
 	sndvar = cur_stream->sndvar;
@@ -1838,7 +1830,7 @@ GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 
 	SBUF_UNLOCK(&sndvar->write_lock);
 
-	return sndvar->sndbuf->data + sndvar->sndbuf->tail_off;
+	return (char *)(sndvar->sndbuf->data + sndvar->sndbuf->tail_off);
 }
 
 int 
@@ -1864,10 +1856,6 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 		TRACE_API("Invalid socket id: %d\n", sockid);
 		errno = EBADF;
 		return -1;
-	}
-	
-	if (socket->socktype == MTCP_SOCK_PIPE) {
-		return PipeRead(mctx, sockid, buf, len);
 	}
 	
 	if (socket->socktype != MTCP_SOCK_STREAM) {
@@ -1902,12 +1890,14 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 	return len;
 }
 
-int SendProcess(mctx_t mctx, int sockid, int recv_len){
+int 
+SendProcess(mctx_t mctx, int sockid, int recv_len){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
 	struct tcp_send_vars *sndvar;
-	struct tcp_recv_vars *rcvvar；
+	struct tcp_recv_vars *rcvvar;
+	int event_remaining;
 	
 	mtcp = GetMTCPManager(mctx);
         if (!mtcp) {
@@ -1927,10 +1917,6 @@ int SendProcess(mctx_t mctx, int sockid, int recv_len){
 		return -1;
 	}
 	
-	if (socket->socktype == MTCP_SOCK_PIPE) {
-		return PipeRead(mctx, sockid, buf, len);
-	}
-	
 	if (socket->socktype != MTCP_SOCK_STREAM) {
 		TRACE_API("Not an end socket. id: %d\n", sockid);
 		errno = ENOTSOCK;
@@ -1945,6 +1931,7 @@ int SendProcess(mctx_t mctx, int sockid, int recv_len){
 		errno = ENOTCONN;
 		return -1;
 	}
+	
 	sndvar = cur_stream->sndvar;
 	rcvvar = cur_stream->rcvvar;
 
@@ -1986,7 +1973,7 @@ int SendProcess(mctx_t mctx, int sockid, int recv_len){
 		}
 	}
 
-	UNUSED(prev_rcv_wnd);
+	UNUSED(previous_rcv_wnd);
 
 	event_remaining = FALSE;
     /* if there are remaining payload, generate EPOLLIN */
