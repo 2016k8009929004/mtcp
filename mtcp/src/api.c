@@ -1825,8 +1825,44 @@ WriteProcess(void * tcp_stream, size_t len){
 }
 
 int 
-SendProcess(void * tcp_stream, int recv_len, int send_len){
-	tcp_stream * cur_stream = (tcp_stream *)tcp_stream;
+SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
+	mtcp_manager_t mtcp;
+	socket_map_t socket;
+	tcp_stream *cur_stream;
+	struct tcp_recv_vars *rcvvar;
+	
+	mtcp = GetMTCPManager(mctx);
+        if (!mtcp) {
+		return NULL;
+	}
+	
+	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
+		TRACE_API("Socket id %d out of range.\n", sockid);
+		errno = EBADF;
+		return NULL;
+	}
+	
+	socket = &mtcp->smap[sockid];
+        if (socket->socktype == MTCP_SOCK_UNUSED) {
+		TRACE_API("Invalid socket id: %d\n", sockid);
+		errno = EBADF;
+		return NULL;
+	}
+	
+	if (socket->socktype != MTCP_SOCK_STREAM) {
+		TRACE_API("Not an end socket. id: %d\n", sockid);
+		errno = ENOTSOCK;
+		return NULL;
+	}
+	
+	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
+	cur_stream = socket->stream;
+        if (!cur_stream || 
+	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
+	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
+		errno = ENOTCONN;
+		return NULL;
+	}
 	
 	sndvar = cur_stream->sndvar;
 	rcvvar = cur_stream->rcvvar;

@@ -152,7 +152,7 @@ int
 WriteProcess(void * tcp_stream, size_t len);
 
 int 
-SendProcess(void * tcp_stream, int recv_len, int send_len);
+SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
 
 #ifdef __cplusplus
 };
