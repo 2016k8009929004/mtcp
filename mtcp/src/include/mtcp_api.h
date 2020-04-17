@@ -149,7 +149,7 @@ char *
 GetSendBuffer(struct mtcp_var * mvar, int to_put);
 
 int 
-WriteProcess(void * arg, size_t len);
+WriteProcess(struct mtcp_var * mvar, size_t len);
 
 int 
 SendProcess(struct mtcp_var * mvar, int recv_len, int send_len);
