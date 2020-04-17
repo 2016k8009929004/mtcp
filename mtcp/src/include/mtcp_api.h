@@ -146,13 +146,13 @@ void *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
 
 char * 
-GetSendBuffer(mctx_t mctx, int sockid, int to_put);
+GetSendBuffer(void * tcp_stream, int to_put);
 
 int 
-WriteProcess(mctx_t mctx, int sockid, size_t len);
+WriteProcess(void * tcp_stream, size_t len);
 
 int 
-SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
+SendProcess(void * tcp_stream, int recv_len, int send_len);
 
 #ifdef __cplusplus
 };
