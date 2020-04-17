@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <sys/uio.h>
 
+#include "socket.h"
 #include "tcp_stream.h"
 
 #ifndef UNUSED
