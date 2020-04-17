@@ -1773,8 +1773,8 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 }
 
 char * 
-GetSendBuffer(void * tcp_stream, int to_put){
-	tcp_stream * cur_stream = (tcp_stream *)tcp_stream;
+GetSendBuffer(void * arg, int to_put){
+	tcp_stream *cur_stream = (tcp_stream *)arg;
 	sndvar = cur_stream->sndvar;
 
 	SBUF_LOCK(&sndvar->write_lock);
@@ -1804,8 +1804,8 @@ GetSendBuffer(void * tcp_stream, int to_put){
 }
 
 int 
-WriteProcess(void * tcp_stream, size_t len){
-	tcp_stream * cur_stream = (tcp_stream *)tcp_stream;
+WriteProcess(void * arg, size_t len){
+	tcp_stream * cur_stream = (tcp_stream *)arg;
 
 	sndvar = cur_stream->sndvar;
 
