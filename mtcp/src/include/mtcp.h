@@ -352,4 +352,15 @@ extern struct mtcp_config CONFIG;
 extern addr_pool_t ap[ETH_NUM];
 /*----------------------------------------------------------------------------*/
 
+//zero copy
+struct mtcp_var {
+	mtcp_manager_t mtcp;
+	socket_map_t socket;
+	tcp_stream *cur_stream;
+	struct tcp_recv_vars *rcvvar;
+	struct tcp_send_vars *sndvar;
+};
+
+#define MTCP_VAR_SIZE sizeof(struct mtcp_var)
+
 #endif /* MTCP_H */

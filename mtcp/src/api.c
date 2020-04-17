@@ -1686,11 +1686,14 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
-void *
+struct mtcp_var *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
+	struct mtcp_var * mvar = (struct mtcp_var *)malloc(MTCP_VAR_SIZE);
+	
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
+	struct tcp_send_vars *sndvar;
 	struct tcp_recv_vars *rcvvar;
 	
 	mtcp = GetMTCPManager(mctx);
@@ -1726,6 +1729,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 		return NULL;
 	}
 
+	sndvar = cur_stream->sndvar;
 	rcvvar = cur_stream->rcvvar;
 	
 	/* if CLOSE_WAIT, return 0 if there is no payload */
@@ -1750,6 +1754,12 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 			return NULL;
 		}
 	}
+
+	mvar->mtcp = mtcp;
+	mvar->socket = socket;
+	mvar->cur_stream = cur_stream;
+	mvar->rcvvar = rcvvar;
+	mvar->sndvar = sndvar;
 	
 	SBUF_LOCK(&rcvvar->read_lock);
 
@@ -1769,23 +1779,15 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
-	return (void *)cur_stream;
+	return mvar;
 }
 
 char * 
-GetSendBuffer(mctx_t mctx, int sockid, int to_put){
-	mtcp_manager_t mtcp;
-	socket_map_t socket;
-	tcp_stream *cur_stream;
-	struct tcp_send_vars *sndvar;
-	
-	mtcp = GetMTCPManager(mctx);
-	
-	socket = &mtcp->smap[sockid];
-
-	cur_stream = socket->stream;
-
-	sndvar = cur_stream->sndvar;
+GetSendBuffer(struct mtcp_var * mvar, int to_put){
+	mtcp_manager_t mtcp = mvar->mtcp;
+	socket_map_t socket = mvar->socket;
+	tcp_stream *cur_stream = mvar->cur_stream;
+	struct tcp_send_vars *sndvar = mvar->sndvar;
 
 	SBUF_LOCK(&sndvar->write_lock);
 
@@ -1835,24 +1837,15 @@ WriteProcess(void * arg, size_t len){
 }
 
 int 
-SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
-	mtcp_manager_t mtcp;
-	socket_map_t socket;
-	tcp_stream *cur_stream;
-	int event_remaining;
-	struct tcp_recv_vars *rcvvar;
-	struct tcp_send_vars *sndvar;
-	
-	mtcp = GetMTCPManager(mctx);
-	
-	socket = &mtcp->smap[sockid];
-	
-	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
-	cur_stream = socket->stream;
-	
-	sndvar = cur_stream->sndvar;
-	rcvvar = cur_stream->rcvvar;
+SendProcess(struct mtcp_var * mvar, int recv_len, int send_len){
+	mtcp_manager_t mtcp = mvar->mtcp;
+	socket_map_t socket = mvar->socket;
+	tcp_stream *cur_stream = mvar->cur_stream;
+	struct tcp_send_vars *sndvar = mvar->sndvar;
+	struct tcp_recv_vars *rcvvar = mvar->rcvvar;
 
+	int event_remaining;
+	
 	SBUF_LOCK(&sndvar->write_lock);
 
 	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;

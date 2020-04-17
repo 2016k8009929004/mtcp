@@ -142,17 +142,17 @@ int
 mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV);
 
 /* zero copy funcions */
-void *
+struct mtcp_var *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
 
 char * 
-GetSendBuffer(mctx_t mctx, int sockid, int to_put);
+GetSendBuffer(struct mtcp_var * mvar, int to_put);
 
 int 
 WriteProcess(void * arg, size_t len);
 
 int 
-SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
+SendProcess(struct mtcp_var * mvar, int recv_len, int send_len);
 
 #ifdef __cplusplus
 };
