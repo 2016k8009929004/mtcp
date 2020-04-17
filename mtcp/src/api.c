@@ -1884,8 +1884,6 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 	sndvar->sndbuf->len += len;
 	sndvar->sndbuf->cum_len += len;
 
-	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;
-
 	SBUF_UNLOCK(&sndvar->write_lock);
 
 	return len;
@@ -1937,6 +1935,8 @@ SendProcess(mctx_t mctx, int sockid, int recv_len){
 	rcvvar = cur_stream->rcvvar;
 
 	SBUF_LOCK(&sndvar->write_lock);
+
+	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;
 
 	if (!(sndvar->on_sendq || sndvar->on_send_list)) {
 		SQ_LOCK(&mtcp->ctx->sendq_lock);
