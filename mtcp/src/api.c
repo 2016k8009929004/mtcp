@@ -1746,7 +1746,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	}
 	
 	SBUF_LOCK(&rcvvar->read_lock);
-	
+
 	int copylen;
 
 	copylen = MIN(rcvvar->rcvbuf->merged_len, 2048);
@@ -1883,6 +1883,8 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 	sndvar->sndbuf->tail_off += len;
 	sndvar->sndbuf->len += len;
 	sndvar->sndbuf->cum_len += len;
+
+	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;
 
 	SBUF_UNLOCK(&sndvar->write_lock);
 
