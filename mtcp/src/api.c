@@ -1891,6 +1891,8 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 
 int 
 SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
+	TRACE_API(" === SendProcess ===\n");
+
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
