@@ -1731,16 +1731,19 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	
 	/* if CLOSE_WAIT, return 0 if there is no payload */
 	if (cur_stream->state == TCP_ST_CLOSE_WAIT) {
-		if (!rcvvar->rcvbuf)
+		if (!rcvvar->rcvbuf){
 			*recv_len = 0;
 			printf(" >> !rcvvar->rcvbuf\n");
 			return NULL;
+		}
 		
-		if (rcvvar->rcvbuf->merged_len == 0)
+		if (rcvvar->rcvbuf->merged_len == 0){
 			*recv_len = 0;
 			printf(" >> rcvvar->rcvbuf->merged_len == 0\n");
 			return NULL;
-        }
+		}
+			
+    }
 	
 	/* return EAGAIN if no receive buffer */
 	if (socket->opts & MTCP_NONBLOCK) {
