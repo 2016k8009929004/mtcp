@@ -21,19 +21,6 @@
 #define MAX(a, b) ((a)>(b)?(a):(b))
 #define MIN(a, b) ((a)<(b)?(a):(b))
 
-/* zero copy funcions */
-tcp_stream *
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
-
-char * 
-GetSendBuffer(mctx_t mctx, int sockid, int to_put);
-
-int 
-WriteProcess(mctx_t mctx, int sockid, size_t len);
-
-int 
-SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
-
 uint32_t previous_rcv_wnd;
 
 /*----------------------------------------------------------------------------*/
@@ -1699,7 +1686,7 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
-tcp_stream *
+void *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
@@ -1782,7 +1769,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
-	return cur_stream;
+	return (void *)cur_stream;
 }
 
 char * 

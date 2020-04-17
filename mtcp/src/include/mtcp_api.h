@@ -141,6 +141,19 @@ mtcp_write(mctx_t mctx, int sockid, const char *buf, size_t len);
 int
 mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV);
 
+/* zero copy funcions */
+void *
+GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
+
+char * 
+GetSendBuffer(mctx_t mctx, int sockid, int to_put);
+
+int 
+WriteProcess(mctx_t mctx, int sockid, size_t len);
+
+int 
+SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
+
 #ifdef __cplusplus
 };
 #endif
