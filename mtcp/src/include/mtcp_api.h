@@ -152,7 +152,7 @@ int
 WriteProcess(mctx_t mctx, int sockid, size_t len);
 
 int 
-SendProcess(mctx_t mctx, int sockid, int recv_len);
+SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
 
 #ifdef __cplusplus
 };

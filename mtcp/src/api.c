@@ -1947,8 +1947,8 @@ SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 	}
 
 	if (send_len == 0 && (socket->opts & MTCP_NONBLOCK)) {
-		ret = -1;
 		errno = EAGAIN;
+		return -1;
 	}
 
 	/* if there are remaining sending buffer, generate write event */
