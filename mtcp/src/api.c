@@ -1686,7 +1686,7 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
-tcp_stream *
+static tcp_stream *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
@@ -1772,7 +1772,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	return cur_stream;
 }
 
-char * 
+static char * 
 GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
@@ -1814,7 +1814,7 @@ GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 	return (char *)(sndvar->sndbuf->data + sndvar->sndbuf->tail_off);
 }
 
-int 
+static int 
 WriteProcess(mctx_t mctx, int sockid, size_t len){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
@@ -1845,7 +1845,7 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 	return len;
 }
 
-int 
+static int 
 SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;

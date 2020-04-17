@@ -5,19 +5,6 @@
 #include <netinet/in.h>
 #include <sys/uio.h>
 
-#include "mtcp.h"
-#include "mtcp_api.h"
-#include "tcp_in.h"
-#include "tcp_stream.h"
-#include "tcp_out.h"
-#include "ip_out.h"
-#include "eventpoll.h"
-#include "pipe.h"
-#include "fhash.h"
-#include "addr_pool.h"
-#include "rss.h"
-#include "debug.h"
-
 #ifndef UNUSED
 #define UNUSED(x)	(void)x
 #endif
@@ -153,19 +140,6 @@ mtcp_write(mctx_t mctx, int sockid, const char *buf, size_t len);
 /* writev should work in atomic */
 int
 mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV);
-
-/* zero copy funcions */
-tcp_stream *
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
-
-char * 
-GetSendBuffer(mctx_t mctx, int sockid, int to_put);
-
-int 
-WriteProcess(mctx_t mctx, int sockid, size_t len);
-
-int 
-SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len);
 
 #ifdef __cplusplus
 };
