@@ -1890,7 +1890,7 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 }
 
 int 
-SendProcess(mctx_t mctx, int sockid, int recv_len){
+SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
@@ -1938,12 +1938,17 @@ SendProcess(mctx_t mctx, int sockid, int recv_len){
 
 	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;
 
-	if (!(sndvar->on_sendq || sndvar->on_send_list)) {
+	if (send_len > 0 && !(sndvar->on_sendq || sndvar->on_send_list)) {
 		SQ_LOCK(&mtcp->ctx->sendq_lock);
 		sndvar->on_sendq = TRUE;
 		StreamEnqueue(mtcp->sendq, cur_stream);		/* this always success */
 		SQ_UNLOCK(&mtcp->ctx->sendq_lock);
 		mtcp->wakeup_flag = TRUE;
+	}
+
+	if (send_len == 0 && (socket->opts & MTCP_NONBLOCK)) {
+		ret = -1;
+		errno = EAGAIN;
 	}
 
 	/* if there are remaining sending buffer, generate write event */
@@ -1998,5 +2003,5 @@ SendProcess(mctx_t mctx, int sockid, int recv_len){
 		}
 	}
 	
-	return 1;
+	return send_len;
 }
