@@ -142,8 +142,8 @@ int
 mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV);
 
 /* zero copy funcions */
-void *
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
+mtcp_manager_t
+GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void ** stream);
 
 char * 
 GetSendBuffer(mtcp_manager_t mtcp, int to_put);

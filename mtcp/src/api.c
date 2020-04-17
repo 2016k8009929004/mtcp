@@ -1686,8 +1686,8 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
-void *
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
+mtcp_manager_t
+GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void ** stream){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
@@ -1759,6 +1759,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	
 	*recv_len = copylen;
 	*recv_buff = (char *)(rcvvar->rcvbuf->head);
+	*stream = (void *)cur_stream;
 	
 	if (copylen <= 0) {
 		errno = EAGAIN;
@@ -1769,7 +1770,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
-	return (void *)cur_stream;
+	return mtcp;
 }
 
 char * 
@@ -1838,37 +1839,11 @@ SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 	struct tcp_send_vars *sndvar;
 	
 	mtcp = GetMTCPManager(mctx);
-        if (!mtcp) {
-		return NULL;
-	}
-	
-	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
-		TRACE_API("Socket id %d out of range.\n", sockid);
-		errno = EBADF;
-		return NULL;
-	}
 	
 	socket = &mtcp->smap[sockid];
-        if (socket->socktype == MTCP_SOCK_UNUSED) {
-		TRACE_API("Invalid socket id: %d\n", sockid);
-		errno = EBADF;
-		return NULL;
-	}
-	
-	if (socket->socktype != MTCP_SOCK_STREAM) {
-		TRACE_API("Not an end socket. id: %d\n", sockid);
-		errno = ENOTSOCK;
-		return NULL;
-	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
 	cur_stream = socket->stream;
-        if (!cur_stream || 
-	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
-	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
-		errno = ENOTCONN;
-		return NULL;
-	}
 	
 	sndvar = cur_stream->sndvar;
 	rcvvar = cur_stream->rcvvar;
