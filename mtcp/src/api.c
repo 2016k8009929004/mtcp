@@ -1779,37 +1779,11 @@ GetSendBuffer(mctx_t mctx, int sockid, int to_put){
 	struct tcp_send_vars * sndvar;
 	
 	mtcp = GetMTCPManager(mctx);
-        if (!mtcp) {
-		return NULL;
-	}
-	
-	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
-		TRACE_API("Socket id %d out of range.\n", sockid);
-		errno = EBADF;
-		return NULL;
-	}
 	
 	socket = &mtcp->smap[sockid];
-        if (socket->socktype == MTCP_SOCK_UNUSED) {
-		TRACE_API("Invalid socket id: %d\n", sockid);
-		errno = EBADF;
-		return NULL;
-	}
-	
-	if (socket->socktype != MTCP_SOCK_STREAM) {
-		TRACE_API("Not an end socket. id: %d\n", sockid);
-		errno = ENOTSOCK;
-		return NULL;
-	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
 	cur_stream = socket->stream;
-        if (!cur_stream || 
-	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
-	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
-		errno = ENOTCONN;
-		return NULL;
-	}
 
 	sndvar = cur_stream->sndvar;
 
@@ -1851,33 +1825,10 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 		return -1;
 	}
 	
-	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
-		TRACE_API("Socket id %d out of range.\n", sockid);
-		errno = EBADF;
-		return -1;
-	}
-	
 	socket = &mtcp->smap[sockid];
-        if (socket->socktype == MTCP_SOCK_UNUSED) {
-		TRACE_API("Invalid socket id: %d\n", sockid);
-		errno = EBADF;
-		return -1;
-	}
-	
-	if (socket->socktype != MTCP_SOCK_STREAM) {
-		TRACE_API("Not an end socket. id: %d\n", sockid);
-		errno = ENOTSOCK;
-		return -1;
-	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
 	cur_stream = socket->stream;
-        if (!cur_stream || 
-	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
-	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
-		errno = ENOTCONN;
-		return -1;
-	}
 
 	sndvar = cur_stream->sndvar;
 
@@ -1910,33 +1861,10 @@ SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 		return -1;
 	}
 	
-	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
-		TRACE_API("Socket id %d out of range.\n", sockid);
-		errno = EBADF;
-		return -1;
-	}
-	
 	socket = &mtcp->smap[sockid];
-        if (socket->socktype == MTCP_SOCK_UNUSED) {
-		TRACE_API("Invalid socket id: %d\n", sockid);
-		errno = EBADF;
-		return -1;
-	}
-	
-	if (socket->socktype != MTCP_SOCK_STREAM) {
-		TRACE_API("Not an end socket. id: %d\n", sockid);
-		errno = ENOTSOCK;
-		return -1;
-	}
 	
 	/* stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT */
 	cur_stream = socket->stream;
-        if (!cur_stream || 
-	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
-	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
-		errno = ENOTCONN;
-		return -1;
-	}
 	
 	sndvar = cur_stream->sndvar;
 	rcvvar = cur_stream->rcvvar;
