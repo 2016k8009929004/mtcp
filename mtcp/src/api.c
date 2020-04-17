@@ -1750,14 +1750,15 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	int copylen;
 
 	copylen = MIN(rcvvar->rcvbuf->merged_len, 2048);
+	
+	*recv_len = copylen;
+	
 	if (copylen <= 0) {
 		errno = EAGAIN;
 		return NULL;
 	}
 
 	previous_rcv_wnd = rcvvar->rcv_wnd;
-
-	*recv_len = copylen;
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
