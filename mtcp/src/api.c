@@ -1774,11 +1774,16 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void *
 }
 
 char * 
-GetSendBuffer(mtcp_manager_t mtcp, int to_put){
+GetSendBuffer(mctx_t mctx, int sockid, int to_put){
+	mtcp_manager_t mtcp;
 	socket_map_t socket;
+	tcp_stream *cur_stream;
+	struct tcp_send_vars *sndvar;
+	
+	mtcp = GetMTCPManager(mctx);
+	
 	socket = &mtcp->smap[sockid];
 
-	tcp_stream *cur_stream;
 	cur_stream = socket->stream;
 
 	sndvar = cur_stream->sndvar;
@@ -1835,6 +1840,7 @@ SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
+	int event_remaining;
 	struct tcp_recv_vars *rcvvar;
 	struct tcp_send_vars *sndvar;
 	

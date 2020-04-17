@@ -146,7 +146,7 @@ mtcp_manager_t
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void ** stream);
 
 char * 
-GetSendBuffer(mtcp_manager_t mtcp, int to_put);
+GetSendBuffer(mctx_t mctx, int sockid, int to_put);
 
 int 
 WriteProcess(void * arg, size_t len);
