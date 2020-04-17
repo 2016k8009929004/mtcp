@@ -1686,8 +1686,8 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
-mtcp_manager_t
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void ** stream){
+void *
+GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
@@ -1759,7 +1759,6 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void *
 	
 	*recv_len = copylen;
 	*recv_buff = (char *)(rcvvar->rcvbuf->head);
-	*stream = (void *)cur_stream;
 	
 	if (copylen <= 0) {
 		errno = EAGAIN;
@@ -1770,7 +1769,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff, void *
 	
 	SBUF_UNLOCK(&rcvvar->read_lock);
 
-	return mtcp;
+	return (void *)cur_stream;
 }
 
 char * 
