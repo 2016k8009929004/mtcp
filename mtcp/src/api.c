@@ -1723,7 +1723,6 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	    !(cur_stream->state >= TCP_ST_ESTABLISHED && 
 	      cur_stream->state <= TCP_ST_CLOSE_WAIT)) {
 		errno = ENOTCONN;
-		printf(" >> stream should be in ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2, CLOSE_WAIT\n");
 		return NULL;
 	}
 
@@ -1733,13 +1732,11 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	if (cur_stream->state == TCP_ST_CLOSE_WAIT) {
 		if (!rcvvar->rcvbuf){
 			*recv_len = 0;
-			printf(" >> !rcvvar->rcvbuf\n");
 			return NULL;
 		}
 		
 		if (rcvvar->rcvbuf->merged_len == 0){
 			*recv_len = 0;
-			printf(" >> rcvvar->rcvbuf->merged_len == 0\n");
 			return NULL;
 		}
 			
@@ -1750,7 +1747,6 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 		if (!rcvvar->rcvbuf || rcvvar->rcvbuf->merged_len == 0) {
 			errno = EAGAIN;
 			*recv_len = 0;
-			printf(" >> return EAGAIN\n");
 			return NULL;
 		}
 	}
@@ -1765,7 +1761,6 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	
 	if (copylen <= 0) {
 		errno = EAGAIN;
-		printf(" >> copylen <= 0\n");
 		return NULL;
 	}
 
