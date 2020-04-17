@@ -1731,9 +1731,11 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	/* if CLOSE_WAIT, return 0 if there is no payload */
 	if (cur_stream->state == TCP_ST_CLOSE_WAIT) {
 		if (!rcvvar->rcvbuf)
+			*recv_len = 0;
 			return NULL;
 		
 		if (rcvvar->rcvbuf->merged_len == 0)
+			*recv_len = 0;
 			return NULL;
         }
 	
@@ -1741,6 +1743,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len){
 	if (socket->opts & MTCP_NONBLOCK) {
 		if (!rcvvar->rcvbuf || rcvvar->rcvbuf->merged_len == 0) {
 			errno = EAGAIN;
+			*recv_len = 0;
 			return NULL;
 		}
 	}
