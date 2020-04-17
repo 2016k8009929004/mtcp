@@ -5,8 +5,18 @@
 #include <netinet/in.h>
 #include <sys/uio.h>
 
-#include "socket.h"
+#include "mtcp.h"
+#include "mtcp_api.h"
+#include "tcp_in.h"
 #include "tcp_stream.h"
+#include "tcp_out.h"
+#include "ip_out.h"
+#include "eventpoll.h"
+#include "pipe.h"
+#include "fhash.h"
+#include "addr_pool.h"
+#include "rss.h"
+#include "debug.h"
 
 #ifndef UNUSED
 #define UNUSED(x)	(void)x
