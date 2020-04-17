@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <sys/uio.h>
 
+#include "tcp_stream.h"
+
 #ifndef UNUSED
 #define UNUSED(x)	(void)x
 #endif
@@ -142,8 +144,8 @@ int
 mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV);
 
 /* zero copy funcions */
-char * 
-GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len);
+tcp_stream *
+GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff);
 
 char * 
 GetSendBuffer(mctx_t mctx, int sockid, int to_put);
