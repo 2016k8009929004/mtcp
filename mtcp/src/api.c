@@ -1891,8 +1891,6 @@ WriteProcess(mctx_t mctx, int sockid, size_t len){
 
 int 
 SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
-	printf(" === SendProcess ===\n");
-
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
 	tcp_stream *cur_stream;
@@ -1944,7 +1942,6 @@ SendProcess(mctx_t mctx, int sockid, int recv_len, int send_len){
 		SQ_LOCK(&mtcp->ctx->sendq_lock);
 		sndvar->on_sendq = TRUE;
 		StreamEnqueue(mtcp->sendq, cur_stream);		/* this always success */
-		printf(" >> Enqueued event to send queue\n");
 		SQ_UNLOCK(&mtcp->ctx->sendq_lock);
 		mtcp->wakeup_flag = TRUE;
 	}
