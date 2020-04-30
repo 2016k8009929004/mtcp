@@ -1845,6 +1845,14 @@ SendProcess(struct mtcp_var * mvar, int recv_len, int send_len){
 
 	SBUF_LOCK(&sndvar->write_lock);
 
+	if (send_len <= 0){
+		return 0;
+	}
+
+	sndvar->sndbuf->tail_off += send_len;
+	sndvar->sndbuf->len += send_len;
+	sndvar->sndbuf->cum_len += send_len;
+
 	sndvar->snd_wnd = sndvar->sndbuf->size - sndvar->sndbuf->len;
 
 	if (send_len > 0 && !(sndvar->on_sendq || sndvar->on_send_list)) {
