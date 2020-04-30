@@ -1783,7 +1783,7 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 char * 
 GetSendBuffer(struct mtcp_var * mvar, int to_put){
 	mtcp_manager_t mtcp = mvar->mtcp;
-	tcp_stream *cur_stream = mvar->stream;
+	tcp_stream *cur_stream = mvar->cur_stream;
 	struct tcp_send_vars *sndvar = mvar->sndvar;
 
 	SBUF_LOCK(&sndvar->write_lock);
@@ -1814,8 +1814,6 @@ GetSendBuffer(struct mtcp_var * mvar, int to_put){
 
 int 
 WriteProcess(struct mtcp_var * mvar, size_t len){
-	tcp_stream * cur_stream = mvar->socket->stream;
-
 	struct tcp_send_vars * sndvar = mvar->sndvar;
 
 	SBUF_LOCK(&sndvar->write_lock);
@@ -1837,7 +1835,7 @@ int
 SendProcess(struct mtcp_var * mvar, int recv_len, int send_len){
 	mtcp_manager_t mtcp = mvar->mtcp;
 	socket_map_t socket = mvar->socket;
-	tcp_stream *cur_stream = mvar->stream;
+	tcp_stream *cur_stream = mvar->cur_stream;
 	struct tcp_send_vars *sndvar = mvar->sndvar;
 	struct tcp_recv_vars *rcvvar = mvar->rcvvar;
 
