@@ -356,6 +356,9 @@ extern addr_pool_t ap[ETH_NUM];
 struct mtcp_var {
 	mtcp_manager_t mtcp;
 	socket_map_t socket;
+	void * cur_stream;
+	void * sndvar;
+	void * rcvvar; 
 };
 
 #define MTCP_VAR_SIZE sizeof(struct mtcp_var)
