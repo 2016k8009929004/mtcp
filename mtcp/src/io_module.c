@@ -356,11 +356,12 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 #else
 		num_devices = rte_eth_dev_count_avail();
 #endif
+/*
 		if (num_devices == 0) {
 			TRACE_ERROR("No Ethernet port!\n");
 			exit(EXIT_FAILURE);
 		}
-
+*/
 		/* get mac addr entries of 'detected' dpdk ports */
 		for (ret = 0; ret < num_devices; ret++)
 			rte_eth_macaddr_get(ret, &ports_eth_addr[ret]);
