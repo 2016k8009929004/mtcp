@@ -710,6 +710,7 @@ dpdk_load_module(void)
 			/* init port */
 			printf("Initializing port %u... ", (unsigned) portid);
 			fflush(stdout);
+			printf("driver name: %s\n", dev_info[portid].driver_name);
 			if (!strncmp(dev_info[portid].driver_name, "net_mlx", 7))
 				port_conf.rx_adv_conf.rss_conf.rss_key_len = 40;
 			
