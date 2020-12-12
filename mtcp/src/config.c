@@ -763,7 +763,6 @@ PrintConfiguration()
 	TRACE_CONFIG("TCP timewait seconds: %d\n", 
 			USEC_TO_SEC(CONFIG.tcp_timewait * TIME_TICK));
 	TRACE_CONFIG("NICs to print statistics:");
-	TRACE_CONFIG("\tether num: %d\n", CONFIG.eths_num);
 	for (i = 0; i < CONFIG.eths_num; i++) {
 		if (CONFIG.eths[i].stat_print) {
 			TRACE_CONFIG(" %s", CONFIG.eths[i].dev_name);
