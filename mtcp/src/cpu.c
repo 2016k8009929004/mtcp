@@ -76,8 +76,6 @@ mtcp_core_affinitize(int cpu)
 	CPU_ZERO(&cpus);
 	CPU_SET((unsigned)cpu, &cpus);
 
-	printf(" [%s on core %u] running on core %u\n", __func__, rte_lcore_id(), cpu);
-
 #ifndef DISABLE_DPDK
 	return rte_thread_set_affinity(&cpus);
 #else
