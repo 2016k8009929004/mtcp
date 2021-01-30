@@ -919,7 +919,7 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 		return NULL;
 	}
 	g_mtcp[ctx->cpu] = mtcp;
-	pthread_mutex_init(&g_mtcp_mutex, NULL);
+	pthread_mutex_init(&g_mtcp_lock, NULL);
 
 	mtcp->tcp_flow_table = CreateHashtable(HashFlow, EqualFlow, NUM_BINS_FLOWS);
 	if (!mtcp->tcp_flow_table) {
