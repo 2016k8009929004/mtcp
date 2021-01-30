@@ -119,7 +119,7 @@ mtcp_epoll_create1(mctx_t mctx, int flags)
 int 
 mtcp_epoll_create(mctx_t mctx, int size)
 {
-	mtcp_manager_t mtcp = g_mtcp[mctx->cpu];
+	mtcp_manager_t mtcp = g_mtcp;
 	struct mtcp_epoll *ep;
 	socket_map_t epsocket;
 

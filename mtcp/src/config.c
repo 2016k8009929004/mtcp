@@ -27,7 +27,7 @@
 
 static const char *route_file = 		"config/route.conf";
 static const char *arp_file = 			"config/arp.conf";
-struct mtcp_manager *g_mtcp[MAX_CPUS] = 	{NULL};
+struct mtcp_manager *g_mtcp = 	{NULL};
 struct mtcp_config CONFIG = {
 	/* set default configuration */
 	.max_concurrency  =			10000,

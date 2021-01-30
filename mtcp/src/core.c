@@ -918,7 +918,7 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 		fprintf(stderr, "Failed to allocate mtcp_manager.\n");
 		return NULL;
 	}
-	g_mtcp[ctx->cpu] = mtcp;
+	g_mtcp = mtcp;
 
 	mtcp->tcp_flow_table = CreateHashtable(HashFlow, EqualFlow, NUM_BINS_FLOWS);
 	if (!mtcp->tcp_flow_table) {
@@ -1248,11 +1248,11 @@ MTCPRunThread(void *arg)
 	m.cpu = cpu;
 	mtcp_free_context(&m);
 	/* destroy hash tables */
-	DestroyHashtable(g_mtcp[cpu]->tcp_flow_table);
+	DestroyHashtable(g_mtcp->tcp_flow_table);
 #if USE_CCP
-	DestroyHashtable(g_mtcp[cpu]->tcp_sid_table);
+	DestroyHashtable(g_mtcp->tcp_sid_table);
 #endif
-	DestroyHashtable(g_mtcp[cpu]->listeners);
+	DestroyHashtable(g_mtcp->listeners);
 	
 	TRACE_DBG("MTCP thread %d finished.\n", ctx->cpu);
 	
@@ -1591,8 +1591,9 @@ mtcp_init(const char *config_file)
 	}
 #endif
 
+	g_mtcp = NULL;
+
 	for (i = 0; i < num_cpus; i++) {
-		g_mtcp[i] = NULL;
 		running[i] = FALSE;
 		sigint_cnt[i] = 0;
 	}

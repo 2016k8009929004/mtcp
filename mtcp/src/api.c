@@ -53,12 +53,12 @@ GetMTCPManager(mctx_t mctx)
 		return NULL;
 	}
 
-	if (g_mtcp[mctx->cpu]->ctx->done || g_mtcp[mctx->cpu]->ctx->exit) {
+	if (g_mtcp->ctx->done || g_mtcp->ctx->exit) {
 		errno = EPERM;
 		return NULL;
 	}
 
-	return g_mtcp[mctx->cpu];
+	return g_mtcp;
 }
 /*----------------------------------------------------------------------------*/
 static inline int 
