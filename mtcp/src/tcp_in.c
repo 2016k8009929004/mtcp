@@ -680,6 +680,8 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 {
 	tcp_stream *cur_stream;
 	int ret; 
+
+	printf(" [%s] syn: %d, ack: %d, rst: %d\n", __func__, tcph->syn, tcph->ack, tcph->rst);
 	
 	if (tcph->syn && !tcph->ack) {
 		/* handle the SYN */

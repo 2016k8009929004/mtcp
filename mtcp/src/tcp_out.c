@@ -622,6 +622,7 @@ SendControlPacket(mtcp_manager_t mtcp, tcp_stream *cur_stream, uint32_t cur_ts)
 	} else if (cur_stream->state == TCP_ST_SYN_RCVD) {
 		/* Send SYN/ACK here */
 		cur_stream->snd_nxt = sndvar->iss;
+		printf(" [%s] sending SYN|ACK packet\n", __func__);
 		ret = SendTCPPacket(mtcp, cur_stream, cur_ts, 
 				TCP_FLAG_SYN | TCP_FLAG_ACK, NULL, 0);
 
