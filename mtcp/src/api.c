@@ -811,6 +811,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 	}
 
 	pthread_mutex_lock(&g_mtcp_lock);
+	printf(" [%s on core %u] connecting to server...\n", __func__, rte_lcore_id());
 	cur_stream = CreateTCPStream(mtcp, socket, socket->socktype, 
 			socket->saddr.sin_addr.s_addr, socket->saddr.sin_port, dip, dport);
 	pthread_mutex_unlock(&g_mtcp_lock);
