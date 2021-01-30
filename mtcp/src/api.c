@@ -316,7 +316,9 @@ mtcp_setsock_nonblock(mctx_t mctx, int sockid)
 		return -1;
 	}
 
+	pthread_mutex_lock(&g_mtcp_lock);
 	mtcp->smap[sockid].opts |= MTCP_NONBLOCK;
+	pthread_mutex_unlock(&g_mtcp_lock);
 
 	return 0;
 }
@@ -370,8 +372,12 @@ mtcp_socket_ioctl(mctx_t mctx, int sockid, int request, void *argp)
 
 	} else if (request == FIONBIO) {
 		int32_t arg = *(int32_t *)argp;
-		if (arg != 0)
+		if (arg != 0) {
+			pthread_mutex_lock(&g_mtcp_lock);
 			return mtcp_setsock_nonblock(mctx, sockid);
+			pthread_mutex_unlock(&g_mtcp_lock);
+		}
+			
 	} else {
 		errno = EINVAL;
 		return -1;
@@ -403,7 +409,9 @@ mtcp_socket(mctx_t mctx, int domain, int type, int protocol)
 		return -1;
 	}
 
+	pthread_mutex_lock(&g_mtcp_lock);
 	socket = AllocateSocket(mctx, type, FALSE);
+	pthread_mutex_unlock(&g_mtcp_lock);
 	if (!socket) {
 		errno = ENFILE;
 		return -1;
@@ -464,9 +472,11 @@ mtcp_bind(mctx_t mctx, int sockid,
 
 	/* TODO: validate whether the address is already being used */
 
+	pthread_mutex_lock(&g_mtcp_lock);
 	addr_in = (struct sockaddr_in *)addr;
 	mtcp->smap[sockid].saddr = *addr_in;
 	mtcp->smap[sockid].opts |= MTCP_ADDR_BIND;
+	pthread_mutex_unlock(&g_mtcp_lock);
 
 	return 0;
 }
@@ -510,11 +520,13 @@ mtcp_listen(mctx_t mctx, int sockid, int backlog)
 	}
 
 	/* check whether we are not already listening on the same port */
+	pthread_mutex_lock(&g_mtcp_lock);
 	if (ListenerHTSearch(mtcp->listeners, 
 			     &mtcp->smap[sockid].saddr.sin_port)) {
 		errno = EADDRINUSE;
 		return -1;
 	}
+	pthread_mutex_unlock(&g_mtcp_lock);
 
 	listener = (struct tcp_listener *)calloc(1, sizeof(struct tcp_listener));
 	if (!listener) {
@@ -546,8 +558,10 @@ mtcp_listen(mctx_t mctx, int sockid, int backlog)
 		return -1;
 	}
 	
+	pthread_mutex_lock(&g_mtcp_lock);
 	mtcp->smap[sockid].listener = listener;
 	ListenerHTInsert(mtcp->listeners, listener);
+	pthread_mutex_unlock(&g_mtcp_lock);
 
 	return 0;
 }
@@ -577,7 +591,9 @@ mtcp_accept(mctx_t mctx, int sockid, struct sockaddr *addr, socklen_t *addrlen)
 		return -1;
 	}
 
+	pthread_mutex_lock(&g_mtcp_lock);
 	listener = mtcp->smap[sockid].listener;
+	pthread_mutex_unlock(&g_mtcp_lock);
 
 	/* dequeue from the acceptq without lock first */
 	/* if nothing there, acquire lock and cond_wait */
@@ -607,7 +623,9 @@ mtcp_accept(mctx_t mctx, int sockid, struct sockaddr *addr, socklen_t *addrlen)
 	}
 
 	if (!accepted->socket) {
+		pthread_mutex_lock(&g_mtcp_lock);
 		socket = AllocateSocket(mctx, MTCP_SOCK_STREAM, FALSE);
+		pthread_mutex_unlock(&g_mtcp_lock);
 		if (!socket) {
 			TRACE_ERROR("Failed to create new socket!\n");
 			/* TODO: destroy the stream */
@@ -792,8 +810,10 @@ mtcp_connect(mctx_t mctx, int sockid,
 		is_dyn_bound = TRUE;
 	}
 
+	pthread_mutex_lock(&g_mtcp_lock);
 	cur_stream = CreateTCPStream(mtcp, socket, socket->socktype, 
 			socket->saddr.sin_addr.s_addr, socket->saddr.sin_port, dip, dport);
+	pthread_mutex_unlock(&g_mtcp_lock);
 	if (!cur_stream) {
 		TRACE_ERROR("Socket %d: failed to create tcp_stream!\n", sockid);
 		errno = ENOMEM;
@@ -1238,7 +1258,9 @@ mtcp_recv(mctx_t mctx, int sockid, char *buf, size_t len, int flags)
 
 	switch (flags) {
 	case 0:
+		pthread_mutex_lock(&g_mtcp_lock);
 		ret = CopyToUser(mtcp, cur_stream, buf, len);
+		pthread_mutex_unlock(&g_mtcp_lock);
 		break;
 	case MSG_PEEK:
 		ret = PeekForUser(mtcp, cur_stream, buf, len);
@@ -1374,7 +1396,9 @@ mtcp_readv(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 		if (iov[i].iov_len <= 0)
 			continue;
 
+		pthread_mutex_lock(&g_mtcp_lock);
 		ret = CopyToUser(mtcp, cur_stream, iov[i].iov_base, iov[i].iov_len);
+		pthread_mutex_unlock(&g_mtcp_lock);
 		if (ret <= 0)
 			break;
 
@@ -1698,18 +1722,8 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	mtcp = GetMTCPManager(mctx);
         if (!mtcp) {
 		return NULL;
-	}
-	
-	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
-		TRACE_API("Socket id %d out of range.\n", sockid);
-		errno = EBADF;
-		return NULL;
-	}
-	
-	socket = &mtcp->smap[sockid];
-        if (socket->socktype == MTCP_SOCK_UNUSED) {
-		TRACE_API("Invalid socket id: %d\n", sockid);
-		errno = EBADF;
+	}		pthread_mutex_lock(&g_mtcp_lock);
+;
 		return NULL;
 	}
 	
