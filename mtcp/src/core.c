@@ -288,9 +288,9 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 	memset(&g_nstat, 0, sizeof(struct net_stat));
 	for (i = 0; i < CONFIG.num_cores; i++) {
 		if (running[i]) {
-			PrintThreadNetworkStats(g_mtcp[i], &ns);
+			PrintThreadNetworkStats(g_mtcp, &ns);
 #if NETSTAT_TOTAL
-			gflow_cnt += g_mtcp[i]->flow_cnt;
+			gflow_cnt += g_mtcp->flow_cnt;
 			for (j = 0; j < CONFIG.eths_num; j++) {
 				g_nstat.rx_packets[j] += ns.rx_packets[j];
 				g_nstat.rx_errors[j] += ns.rx_errors[j];
@@ -327,7 +327,7 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 	memset(&g_runstat, 0, sizeof(struct run_stat));
 	for (i = 0; i < CONFIG.num_cores; i++) {
 		if (running[i]) {
-			PrintThreadRoundStats(g_mtcp[i], &rs);
+			PrintThreadRoundStats(g_mtcp, &rs);
 #if 0
 			g_runstat.rounds += rs.rounds;
 			g_runstat.rounds_rx += rs.rounds_rx;
@@ -353,8 +353,8 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 
 #if EVENT_STAT
 	for (i = 0; i < CONFIG.num_cores; i++) {
-		if (running[i] && g_mtcp[i]->ep) {
-			PrintEventStat(i, &g_mtcp[i]->ep->stat);
+		if (running[i] && g_mtcp->ep) {
+			PrintEventStat(i, &g_mtcp->ep->stat);
 		}
 	}
 #endif
