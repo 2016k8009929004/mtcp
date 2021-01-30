@@ -260,6 +260,7 @@ SendTCPPacket(struct mtcp_manager *mtcp, tcp_stream *cur_stream,
 	}
 	if (flags & TCP_FLAG_RST) {
 		TRACE_FIN("Stream %d: Sending RST.\n", cur_stream->id);
+		printf(" [%s] Stream %d: Sending RST.\n", cur_stream->id);
 		tcph->rst = TRUE;
 	}
 	if (flags & TCP_FLAG_PSH)
