@@ -796,7 +796,7 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 					ProcessPacket(mtcp, rx_inf, ts, pktbuf, len);
 					pthread_mutex_unlock(&g_mtcp_lock);
 #ifdef NETSTAT
-				else
+				} else {
 					mtcp->nstat.rx_errors[rx_inf]++;
 #endif					
 				}
