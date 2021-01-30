@@ -1221,6 +1221,8 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	if (ip_len < ((iph->ihl + tcph->doff) << 2))
 		return ERROR;
 
+	printf(" >> ip packet valid\n");
+
 #if VERIFY_RX_CHECKSUM
 #ifndef DISABLE_HWCSUM
 	if (mtcp->iom->dev_ioctl != NULL)
@@ -1239,6 +1241,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 #endif
+	printf(" >> checksum valid\n");
 
 #if defined(NETSTAT) && defined(ENABLELRO)
 	mtcp->nstat.rx_gdptbytes += payloadlen;
@@ -1256,6 +1259,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		if (!cur_stream)
 			return TRUE;
 	}
+	printf(" >> find stream\n");
 
 	/* Validate sequence. if not valid, ignore the packet */
 	if (cur_stream->state > TCP_ST_SYN_RCVD) {
@@ -1274,6 +1278,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 
+	printf(" >> sequence valid\n");
 	/* Update receive window size */
 	if (tcph->syn) {
 		cur_stream->sndvar->peer_wnd = window;
@@ -1285,6 +1290,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	cur_stream->last_active_ts = cur_ts;
 	UpdateTimeoutList(mtcp, cur_stream);
 
+	printf(" >> update window size\n");
 	/* Process RST: process here only if state > TCP_ST_SYN_SENT */
 	if (tcph->rst) {
 		cur_stream->have_reset = TRUE;
@@ -1295,6 +1301,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 
+	printf(" >> check stream state...\n");
 	switch (cur_stream->state) {
 	case TCP_ST_LISTEN:
 		Handle_TCP_ST_LISTEN(mtcp, cur_ts, cur_stream, tcph);
