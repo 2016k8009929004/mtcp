@@ -689,7 +689,7 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 #ifdef DBGMSG
 			DumpIPPacket(mtcp, iph, ip_len);
 #endif
-			printf(" [%s] Refusing SYN packet\n", __func__);
+			//printf(" [%s] Refusing SYN packet\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -706,7 +706,7 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 #ifdef DBGMSG
 			DumpIPPacket(mtcp, iph, ip_len);
 #endif
-			printf(" [%s] Not available space in flow pool.\n", __func__);
+			//printf(" [%s] Not available space in flow pool.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -735,12 +735,12 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 		   <SEQ=SEG.ACK><CTL=RST>
 		   */
 		if (tcph->ack) {
-			printf(" [%s] 1. Weird packet comes.\n", __func__);
+			//printf(" [%s] 1. Weird packet comes.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
 		} else {
-			printf(" [%s] 2. Weird packet comes.\n", __func__);
+			//printf(" [%s] 2. Weird packet comes.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -778,7 +778,7 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 		if (TCP_SEQ_LEQ(ack_seq, cur_stream->sndvar->iss) || 
 				TCP_SEQ_GT(ack_seq, cur_stream->snd_nxt)) {
 			if (!tcph->rst) {
-				printf(" [%s] filter the unacceptable acks\n", __func__);
+				//printf(" [%s] filter the unacceptable acks\n", __func__);
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
@@ -820,7 +820,7 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 				RaiseWriteEvent(mtcp, cur_stream);
 			} else {
 				TRACE_STATE("Stream %d: ESTABLISHED, but no socket\n", cur_stream->id);
-				printf(" [%s] Stream %d: ESTABLISHED, but no socket\n", __func__, cur_stream->id);
+				//printf(" [%s] Stream %d: ESTABLISHED, but no socket\n", __func__, cur_stream->id);
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -1227,7 +1227,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	if (ip_len < ((iph->ihl + tcph->doff) << 2))
 		return ERROR;
 
-	printf(" >> ip packet valid\n");
+	//printf(" >> ip packet valid\n");
 
 #if VERIFY_RX_CHECKSUM
 #ifndef DISABLE_HWCSUM
@@ -1247,7 +1247,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 #endif
-	printf(" >> checksum valid\n");
+	//printf(" >> checksum valid\n");
 
 #if defined(NETSTAT) && defined(ENABLELRO)
 	mtcp->nstat.rx_gdptbytes += payloadlen;
@@ -1265,7 +1265,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		if (!cur_stream)
 			return TRUE;
 	}
-	printf(" >> find stream\n");
+	//printf(" >> find stream\n");
 
 	/* Validate sequence. if not valid, ignore the packet */
 	if (cur_stream->state > TCP_ST_SYN_RCVD) {
@@ -1284,7 +1284,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 
-	printf(" >> sequence valid\n");
+	//printf(" >> sequence valid\n");
 	/* Update receive window size */
 	if (tcph->syn) {
 		cur_stream->sndvar->peer_wnd = window;
@@ -1296,9 +1296,9 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	cur_stream->last_active_ts = cur_ts;
 	UpdateTimeoutList(mtcp, cur_stream);
 
-	printf(" >> update window size\n");
+	//printf(" >> update window size\n");
 	/* Process RST: process here only if state > TCP_ST_SYN_SENT */
-	if (tcph->rst) {
+/*	if (tcph->rst) {
 		printf(" >> reset packet\n");
 		cur_stream->have_reset = TRUE;
 		if (cur_stream->state > TCP_ST_SYN_SENT) {
@@ -1306,7 +1306,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 				return TRUE;
 			}
 		}
-	}
+	}*/
 
 	printf(" >> check stream state...\n");
 	switch (cur_stream->state) {
