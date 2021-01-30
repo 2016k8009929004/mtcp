@@ -1723,8 +1723,18 @@ GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	mtcp = GetMTCPManager(mctx);
         if (!mtcp) {
 		return NULL;
-	}		pthread_mutex_lock(&g_mtcp_lock);
-;
+	}
+	
+	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
+		TRACE_API("Socket id %d out of range.\n", sockid);
+		errno = EBADF;
+		return NULL;
+	}
+	
+	socket = &mtcp->smap[sockid];
+        if (socket->socktype == MTCP_SOCK_UNUSED) {
+		TRACE_API("Invalid socket id: %d\n", sockid);
+		errno = EBADF;
 		return NULL;
 	}
 	
