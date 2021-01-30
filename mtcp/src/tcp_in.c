@@ -1260,6 +1260,9 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	s_stream.daddr = iph->saddr;
 	s_stream.dport = tcph->source;
 
+	printf(" [%s] src ip: %x(%p), dst ip: %x(%d)\n", 
+			__func__, s_stream.saddr, s_stream.sport, s_stream.daddr, s_stream.dport);
+
 	if (!(cur_stream = StreamHTSearch(mtcp->tcp_flow_table, &s_stream))) {
 		/* not found in flow table */
 		cur_stream = CreateNewFlowHTEntry(mtcp, cur_ts, iph, ip_len, tcph, 

@@ -265,11 +265,10 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 	stream->daddr = daddr;
 	stream->dport = dport;
 
+	printf(" [%s] src ip: %x(%p), dst ip: %x(%d)\n", __func__, saddr, sport, daddr, dport);
 	ret = StreamHTInsert(mtcp->tcp_flow_table, stream);
 	if (ret < 0) {
 		TRACE_ERROR("Stream %d: "
-				"Failed to insert the stream into hash table.\n", stream->id);
-		printf("Stream %d: "
 				"Failed to insert the stream into hash table.\n", stream->id);
 		MPFreeChunk(mtcp->flow_pool, stream);
 		pthread_mutex_unlock(&mtcp->ctx->flow_pool_lock);
