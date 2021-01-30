@@ -288,9 +288,9 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 	memset(&g_nstat, 0, sizeof(struct net_stat));
 	for (i = 0; i < CONFIG.num_cores; i++) {
 		if (running[i]) {
-			PrintThreadNetworkStats(g_mtcp, &ns);
+			PrintThreadNetworkStats(g_mtcp[i], &ns);
 #if NETSTAT_TOTAL
-			gflow_cnt += g_mtcp->flow_cnt;
+			gflow_cnt += g_mtcp[i]->flow_cnt;
 			for (j = 0; j < CONFIG.eths_num; j++) {
 				g_nstat.rx_packets[j] += ns.rx_packets[j];
 				g_nstat.rx_errors[j] += ns.rx_errors[j];
@@ -327,7 +327,7 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 	memset(&g_runstat, 0, sizeof(struct run_stat));
 	for (i = 0; i < CONFIG.num_cores; i++) {
 		if (running[i]) {
-			PrintThreadRoundStats(g_mtcp, &rs);
+			PrintThreadRoundStats(g_mtcp[i], &rs);
 #if 0
 			g_runstat.rounds += rs.rounds;
 			g_runstat.rounds_rx += rs.rounds_rx;
@@ -353,8 +353,8 @@ PrintNetworkStats(mtcp_manager_t mtcp, uint32_t cur_ts)
 
 #if EVENT_STAT
 	for (i = 0; i < CONFIG.num_cores; i++) {
-		if (running[i] && g_mtcp->ep) {
-			PrintEventStat(i, &g_mtcp->ep->stat);
+		if (running[i] && g_mtcp[i]->ep) {
+			PrintEventStat(i, &g_mtcp[i]->ep->stat);
 		}
 	}
 #endif
@@ -918,7 +918,8 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 		fprintf(stderr, "Failed to allocate mtcp_manager.\n");
 		return NULL;
 	}
-	g_mtcp = mtcp;
+	g_mtcp[ctx->cpu] = mtcp;
+	pthread_mutex_init(&g_mtcp_mutex, NULL);
 
 	mtcp->tcp_flow_table = CreateHashtable(HashFlow, EqualFlow, NUM_BINS_FLOWS);
 	if (!mtcp->tcp_flow_table) {
@@ -1248,11 +1249,11 @@ MTCPRunThread(void *arg)
 	m.cpu = cpu;
 	mtcp_free_context(&m);
 	/* destroy hash tables */
-	DestroyHashtable(g_mtcp->tcp_flow_table);
+	DestroyHashtable(g_mtcp[cpu]->tcp_flow_table);
 #if USE_CCP
-	DestroyHashtable(g_mtcp->tcp_sid_table);
+	DestroyHashtable(g_mtcp[cpu]->tcp_sid_table);
 #endif
-	DestroyHashtable(g_mtcp->listeners);
+	DestroyHashtable(g_mtcp[cpu]->listeners);
 	
 	TRACE_DBG("MTCP thread %d finished.\n", ctx->cpu);
 	
@@ -1591,9 +1592,8 @@ mtcp_init(const char *config_file)
 	}
 #endif
 
-	g_mtcp = NULL;
-
 	for (i = 0; i < num_cpus; i++) {
+		g_mtcp[i] = NULL;
 		running[i] = FALSE;
 		sigint_cnt[i] = 0;
 	}

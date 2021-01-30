@@ -6,7 +6,7 @@
 socket_map_t 
 AllocateSocket(mctx_t mctx, int socktype, int need_lock)
 {
-	mtcp_manager_t mtcp = g_mtcp;
+	mtcp_manager_t mtcp = g_mtcp[mctx->cpu];
 	socket_map_t socket = NULL;
 
 	if (need_lock)
@@ -56,7 +56,7 @@ AllocateSocket(mctx_t mctx, int socktype, int need_lock)
 void 
 FreeSocket(mctx_t mctx, int sockid, int need_lock)
 {
-	mtcp_manager_t mtcp = g_mtcp;
+	mtcp_manager_t mtcp = g_mtcp[mctx->cpu];
 	socket_map_t socket = &mtcp->smap[sockid];
 
 	if (socket->socktype == MTCP_SOCK_UNUSED) {
@@ -86,5 +86,5 @@ GetSocket(mctx_t mctx, int sockid)
 		return NULL;
 	}
 
-	return &g_mtcp->smap[sockid];
+	return &g_mtcp[mctx->cpu]->smap[sockid];
 }

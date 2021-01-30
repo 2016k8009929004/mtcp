@@ -27,7 +27,9 @@
 
 static const char *route_file = 		"config/route.conf";
 static const char *arp_file = 			"config/arp.conf";
-__thread struct mtcp_manager *g_mtcp = 	{NULL};
+/* @yyh: add global lock for g_mtcp */
+pthread_mutex_t g_mtcp_lock;
+struct mtcp_manager *g_mtcp[MAX_CPUS] = 	{NULL};
 struct mtcp_config CONFIG = {
 	/* set default configuration */
 	.max_concurrency  =			10000,
