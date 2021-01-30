@@ -106,7 +106,7 @@ static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
 #endif
 
 static struct rte_eth_dev_info dev_info[RTE_MAX_ETHPORTS];
-#if 0
+
 static struct rte_eth_conf port_conf = {
 	.rxmode = {
 		.mq_mode	= 	ETH_MQ_RX_RSS,
@@ -141,8 +141,7 @@ static struct rte_eth_conf port_conf = {
 	.rx_adv_conf = {
 		.rss_conf = {
 			.rss_key = 	NULL,
-			.rss_hf = 	ETH_RSS_TCP | ETH_RSS_UDP |
-					ETH_RSS_IP | ETH_RSS_L2_PAYLOAD
+			.rss_hf = 	ETH_RSS_TCP | ETH_RSS_UDP | ETH_RSS_IP
 		},
 	},
 	.txmode = {
@@ -153,26 +152,6 @@ static struct rte_eth_conf port_conf = {
 					 DEV_TX_OFFLOAD_TCP_CKSUM)
 #endif
 	},
-};
-#endif
-
-static struct rte_eth_conf port_conf = {
-	.rxmode = {
-    	.mq_mode        = ETH_MQ_RX_RSS,
-	    .max_rx_pkt_len = RTE_ETHER_MAX_LEN,
-        .offloads	    = 0,
-		.split_hdr_size = 0,
-	},
-	.rx_adv_conf = {
-		.rss_conf = {
-			.rss_key = NULL,
-			.rss_hf = ETH_RSS_TCP | ETH_RSS_UDP | ETH_RSS_IP
-		},
-	},
-    .txmode = {
-        .mq_mode = ETH_MQ_TX_NONE,
-        .offloads = 0,
-    },
 };
 
 static const struct rte_eth_rxconf rx_conf = {
