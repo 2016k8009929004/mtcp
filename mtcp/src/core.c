@@ -1187,7 +1187,7 @@ MTCPRunThread(void *arg)
 		TRACE_ERROR("Failed to initialize mtcp manager.\n");
 		exit(-1);
 	}
-	printf(" [%d on core %u] mtcp: %p\n", __func__, cpu, mtcp);
+	printf(" [%s on core %u] mtcp: %p\n", __func__, cpu, mtcp);
 
 	/* assign mtcp context's underlying I/O module */
 	mtcp->iom = current_iomodule_func;
