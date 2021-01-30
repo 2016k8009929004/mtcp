@@ -1304,6 +1304,7 @@ mtcp_create_context(int cpu)
 		return NULL;
 	}
 	mctx->cpu = cpu;
+	printf(" [%s on core %d] mctx: %p\n", __func__, cpu, mctx);
 
 	/* initialize logger */
 	g_logctx[cpu] = (struct log_thread_context *)
