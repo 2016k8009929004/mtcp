@@ -791,12 +791,15 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 
 			for (i = 0; i < recv_cnt; i++) {
 				pktbuf = mtcp->iom->get_rptr(mtcp->ctx, rx_inf, i, &len);
-				if (pktbuf != NULL)
+				if (pktbuf != NULL){
+					pthread_mutex_lock(&g_mtcp_lock);
 					ProcessPacket(mtcp, rx_inf, ts, pktbuf, len);
+					pthread_mutex_unlock(&g_mtcp_lock);
 #ifdef NETSTAT
 				else
 					mtcp->nstat.rx_errors[rx_inf]++;
-#endif
+#endif					
+				}
 			}
 		}
 		STAT_COUNT(mtcp->runstat.rounds_rx);
