@@ -681,7 +681,8 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 	tcp_stream *cur_stream;
 	int ret; 
 
-	printf(" [%s] syn: %d, ack: %d, rst: %d\n", __func__, tcph->syn, tcph->ack, tcph->rst);
+	printf(" [%s on core %d] syn: %d, ack: %d, rst: %d\n", 
+			__func__, rte_lcore_id(), tcph->syn, tcph->ack, tcph->rst);
 	
 	if (tcph->syn && !tcph->ack) {
 		/* handle the SYN */
@@ -691,7 +692,7 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 #ifdef DBGMSG
 			DumpIPPacket(mtcp, iph, ip_len);
 #endif
-			printf(" [%s] Refusing SYN packet\n", __func__);
+			printf(" >> Refusing SYN packet\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -708,7 +709,7 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 #ifdef DBGMSG
 			DumpIPPacket(mtcp, iph, ip_len);
 #endif
-			printf(" [%s] Not available space in flow pool.\n", __func__);
+			printf(" >> Not available space in flow pool.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -737,12 +738,12 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 		   <SEQ=SEG.ACK><CTL=RST>
 		   */
 		if (tcph->ack) {
-			printf(" [%s] 1. Weird packet comes.\n", __func__);
+			printf(" >> 1. Weird packet comes.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
 		} else {
-			printf(" [%s] 2. Weird packet comes.\n", __func__);
+			printf(" >> 2. Weird packet comes.\n", __func__);
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -780,7 +781,7 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 		if (TCP_SEQ_LEQ(ack_seq, cur_stream->sndvar->iss) || 
 				TCP_SEQ_GT(ack_seq, cur_stream->snd_nxt)) {
 			if (!tcph->rst) {
-				printf(" [%s] filter the unacceptable acks\n", __func__);
+				printf(" [%s on core %d] filter the unacceptable acks\n", __func__, rte_lcore_id());
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
@@ -822,7 +823,6 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 				RaiseWriteEvent(mtcp, cur_stream);
 			} else {
 				TRACE_STATE("Stream %d: ESTABLISHED, but no socket\n", cur_stream->id);
-				printf(" [%s] Stream %d: ESTABLISHED, but no socket\n", __func__, cur_stream->id);
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 

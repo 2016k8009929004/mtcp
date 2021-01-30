@@ -275,7 +275,8 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 		pthread_mutex_unlock(&mtcp->ctx->flow_pool_lock);
 		return NULL;
 	}
-	printf(" [%s] Insert stream %d in to hash table succeeded\n", __func__, stream->id);
+	printf(" [%s on core %d] Insert stream %d in to hash table succeeded\n", 
+			__func__, rte_lcore_id(), stream->id);
 
 #if USE_CCP
 	ret = StreamHTInsert(mtcp->tcp_sid_table, stream);
