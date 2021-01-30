@@ -265,7 +265,7 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 	stream->daddr = daddr;
 	stream->dport = dport;
 
-	printf(" [%s on core %d] src ip: %x(%d), dst ip: %x(%d)\n", 
+	printf(" [%s on core %u] src ip: %x(%d), dst ip: %x(%d)\n", 
 			__func__, rte_lcore_id(), saddr, sport, daddr, dport);
 	ret = StreamHTInsert(mtcp->tcp_flow_table, stream);
 	if (ret < 0) {
@@ -275,7 +275,7 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 		pthread_mutex_unlock(&mtcp->ctx->flow_pool_lock);
 		return NULL;
 	}
-	printf(" [%s on core %d] Insert stream %d in to hash table succeeded\n", 
+	printf(" [%s on core %u] Insert stream %d in to hash table succeeded\n", 
 			__func__, rte_lcore_id(), stream->id);
 
 #if USE_CCP

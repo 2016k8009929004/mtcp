@@ -681,7 +681,7 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 	tcp_stream *cur_stream;
 	int ret; 
 
-	printf(" [%s on core %d] syn: %d, ack: %d, rst: %d\n", 
+	printf(" [%s on core %u] syn: %d, ack: %d, rst: %d\n", 
 			__func__, rte_lcore_id(), tcph->syn, tcph->ack, tcph->rst);
 	
 	if (tcph->syn && !tcph->ack) {
@@ -781,7 +781,7 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 		if (TCP_SEQ_LEQ(ack_seq, cur_stream->sndvar->iss) || 
 				TCP_SEQ_GT(ack_seq, cur_stream->snd_nxt)) {
 			if (!tcph->rst) {
-				printf(" [%s on core %d] filter the unacceptable acks\n", __func__, rte_lcore_id());
+				printf(" [%s on core %u] filter the unacceptable acks\n", __func__, rte_lcore_id());
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
@@ -1260,7 +1260,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	s_stream.daddr = iph->saddr;
 	s_stream.dport = tcph->source;
 
-	printf(" [%s on core %d] src ip: %x(%d), dst ip: %x(%d)\n", 
+	printf(" [%s on core %u] src ip: %x(%d), dst ip: %x(%d)\n", 
 			__func__, rte_lcore_id(), s_stream.saddr, s_stream.sport, s_stream.daddr, s_stream.dport);
 
 	if (!(cur_stream = StreamHTSearch(mtcp->tcp_flow_table, &s_stream))) {

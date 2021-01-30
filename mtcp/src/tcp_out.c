@@ -616,13 +616,13 @@ SendControlPacket(mtcp_manager_t mtcp, tcp_stream *cur_stream, uint32_t cur_ts)
 
 	if (cur_stream->state == TCP_ST_SYN_SENT) {
 		/* Send SYN here */
-		printf(" [%s on core %d] sending SYN packet\n", __func__, rte_lcore_id());
+		printf(" [%s on core %u] sending SYN packet\n", __func__, rte_lcore_id());
 		ret = SendTCPPacket(mtcp, cur_stream, cur_ts, TCP_FLAG_SYN, NULL, 0);
 
 	} else if (cur_stream->state == TCP_ST_SYN_RCVD) {
 		/* Send SYN/ACK here */
 		cur_stream->snd_nxt = sndvar->iss;
-		printf(" [%s on core %d] sending SYN|ACK packet\n", __func__, rte_lcore_id());
+		printf(" [%s on core %u] sending SYN|ACK packet\n", __func__, rte_lcore_id());
 		ret = SendTCPPacket(mtcp, cur_stream, cur_ts, 
 				TCP_FLAG_SYN | TCP_FLAG_ACK, NULL, 0);
 

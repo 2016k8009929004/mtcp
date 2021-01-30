@@ -85,7 +85,7 @@ StreamHTInsert(struct hashtable *ht, void *it)
 	idx = ht->hashfn(item);
 	assert(idx >=0 && idx < NUM_BINS_FLOWS);
 
-	printf(" [%s on core %d] HT addr: %p, index: %d, head: %p\n", 
+	printf(" [%s on core %u] HT addr: %p, index: %d, head: %p\n", 
 			__func__, rte_lcore_id(), ht, idx, &ht->ht_table[ht->hashfn(item)]);
 	TAILQ_INSERT_TAIL(&ht->ht_table[idx], item, rcvvar->he_link);
 
@@ -118,7 +118,7 @@ StreamHTSearch(struct hashtable *ht, const void *it)
 	idx = ht->hashfn(item);
 
 	head = &ht->ht_table[ht->hashfn(item)];
-	printf(" [%s on core %d] HT addr: %p, index: %d, head: %p\n", 
+	printf(" [%s on core %u] HT addr: %p, index: %d, head: %p\n", 
 			__func__, rte_lcore_id(), ht, idx, head);
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {
 		if (ht->eqfn(walk, item)) 
