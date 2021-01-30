@@ -771,6 +771,7 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 
 	gettimeofday(&cur_ts, NULL);
 	TRACE_DBG("CPU %d: mtcp thread running.\n", ctx->cpu);
+	printf(" [%s] mctx: %p, mtcp: %p\n", __func__, ctx, mtcp);
 
 	ts = ts_prev = 0;
 	while ((!ctx->done || mtcp->flow_cnt) && !ctx->exit) {
