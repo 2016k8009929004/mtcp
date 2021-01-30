@@ -59,6 +59,7 @@ whichCoreID(int thread_no)
 int 
 mtcp_core_affinitize(int cpu)
 {
+	printf(" [%s on core %d] binding to core %d\n", __func__, rte_lcore_id(), cpu);
 	cpu_set_t cpus;
 	size_t n;
 	int ret;
@@ -74,6 +75,8 @@ mtcp_core_affinitize(int cpu)
 
 	CPU_ZERO(&cpus);
 	CPU_SET((unsigned)cpu, &cpus);
+
+	printf(" [%s on core %d] running on core %d\n", __func__, rte_lcore_id(), cpu);
 
 #ifndef DISABLE_DPDK
 	return rte_thread_set_affinity(&cpus);
