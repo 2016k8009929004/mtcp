@@ -1293,6 +1293,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	printf(" >> update window size\n");
 	/* Process RST: process here only if state > TCP_ST_SYN_SENT */
 	if (tcph->rst) {
+		printf(" >> reset packet\n");
 		cur_stream->have_reset = TRUE;
 		if (cur_stream->state > TCP_ST_SYN_SENT) {
 			if (ProcessRST(mtcp, cur_stream, ack_seq)) {
