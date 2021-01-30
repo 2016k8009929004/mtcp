@@ -1710,6 +1710,7 @@ mtcp_writev(mctx_t mctx, int sockid, const struct iovec *iov, int numIOV)
 }
 /*----------------------------------------------------------------------------*/
 //ZERO COPY
+#if 0
 struct mtcp_var *
 GetRecvBuffer(mctx_t mctx, int sockid, int * recv_len, char ** recv_buff){
 	struct mtcp_var * mvar = (struct mtcp_var *)malloc(MTCP_VAR_SIZE);
@@ -1934,3 +1935,4 @@ SendProcess(struct mtcp_var * mvar, int recv_len, int send_len){
 	
 	return send_len;
 }
+#endif
