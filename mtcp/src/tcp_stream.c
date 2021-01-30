@@ -269,6 +269,8 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 	if (ret < 0) {
 		TRACE_ERROR("Stream %d: "
 				"Failed to insert the stream into hash table.\n", stream->id);
+		printf("Stream %d: "
+				"Failed to insert the stream into hash table.\n", stream->id);
 		MPFreeChunk(mtcp->flow_pool, stream);
 		pthread_mutex_unlock(&mtcp->ctx->flow_pool_lock);
 		return NULL;
