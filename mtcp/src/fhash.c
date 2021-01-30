@@ -83,6 +83,7 @@ StreamHTInsert(struct hashtable *ht, void *it)
 	assert(ht);
 
 	idx = ht->hashfn(item);
+	printf(" [%s] hash index: %d\n", __func__, idx);
 	assert(idx >=0 && idx < NUM_BINS_FLOWS);
 
 	TAILQ_INSERT_TAIL(&ht->ht_table[idx], item, rcvvar->he_link);
@@ -114,6 +115,7 @@ StreamHTSearch(struct hashtable *ht, const void *it)
 	hash_bucket_head *head;
 
 	idx = ht->hashfn(item);
+	printf(" [%s] hash index: %d\n", __func__, idx);
 
 	head = &ht->ht_table[ht->hashfn(item)];
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {

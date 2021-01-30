@@ -1270,7 +1270,6 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		if (!cur_stream)
 			return TRUE;
 	}
-	//printf(" >> find stream\n");
 
 	/* Validate sequence. if not valid, ignore the packet */
 	if (cur_stream->state > TCP_ST_SYN_RCVD) {
