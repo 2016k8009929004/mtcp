@@ -726,6 +726,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 	if (!mtcp) {
 		return -1;
 	}
+	printf(" [%s] on core %d\n", __func__, mctx->cpu);
 
 	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
 		TRACE_API("Socket id %d out of range.\n", sockid);
@@ -811,7 +812,6 @@ mtcp_connect(mctx_t mctx, int sockid,
 	}
 
 	pthread_mutex_lock(&g_mtcp_lock);
-	printf(" [%s on core %u] connecting to server...\n", __func__, rte_lcore_id());
 	cur_stream = CreateTCPStream(mtcp, socket, socket->socktype, 
 			socket->saddr.sin_addr.s_addr, socket->saddr.sin_port, dip, dport);
 	pthread_mutex_unlock(&g_mtcp_lock);
