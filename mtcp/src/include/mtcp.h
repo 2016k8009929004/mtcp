@@ -364,6 +364,4 @@ struct mtcp_var {
 
 #define MTCP_VAR_SIZE sizeof(struct mtcp_var)
 
-#define DISABLE_HWCSUM
-
 #endif /* MTCP_H */

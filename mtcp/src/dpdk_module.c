@@ -160,7 +160,7 @@ static struct rte_eth_conf port_conf = {
 	.rxmode = {
     	.mq_mode        = ETH_MQ_RX_RSS,
 	    .max_rx_pkt_len = RTE_ETHER_MAX_LEN,
-        //.offloads	    = DEV_RX_OFFLOAD_CHECKSUM,
+        .offloads	    = 0,
 		.split_hdr_size = 0,
 	},
 	.rx_adv_conf = {
@@ -171,9 +171,7 @@ static struct rte_eth_conf port_conf = {
 	},
     .txmode = {
         .mq_mode = ETH_MQ_TX_NONE,
-        //.offloads	=	(DEV_TX_OFFLOAD_IPV4_CKSUM |
-		//			 DEV_TX_OFFLOAD_UDP_CKSUM |
-		//			 DEV_TX_OFFLOAD_TCP_CKSUM)
+        .offloads = 0,
     },
 };
 
