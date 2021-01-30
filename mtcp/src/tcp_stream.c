@@ -265,8 +265,8 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 	stream->daddr = daddr;
 	stream->dport = dport;
 
-	printf(" [%s on core %u] src ip: %x(%d), dst ip: %x(%d)\n", 
-			__func__, rte_lcore_id(), saddr, sport, daddr, dport);
+	printf(" [%s on core %u] mtcp: %p, src ip: %x(%d), dst ip: %x(%d)\n", 
+			__func__, rte_lcore_id(), mtcp, saddr, sport, daddr, dport);
 	ret = StreamHTInsert(mtcp->tcp_flow_table, stream);
 	if (ret < 0) {
 		TRACE_ERROR("Stream %d: "
