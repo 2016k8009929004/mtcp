@@ -1308,7 +1308,7 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}*/
 
-	printf(" >> check stream state...\n");
+	//printf(" >> check stream state...\n");
 	switch (cur_stream->state) {
 	case TCP_ST_LISTEN:
 		Handle_TCP_ST_LISTEN(mtcp, cur_ts, cur_stream, tcph);
