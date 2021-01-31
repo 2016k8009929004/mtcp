@@ -99,7 +99,7 @@ GetRSSCPUCore(in_addr_t sip, in_addr_t dip,
 	      in_port_t sp, in_port_t dp, int num_queues, uint8_t endian_check)
 {
 	uint32_t masked;
-
+#if 0
 	if (endian_check) {
 		/* i40e */
 		static const uint32_t off[] = {3, 1, -1, -3};
@@ -109,7 +109,10 @@ GetRSSCPUCore(in_addr_t sip, in_addr_t dip,
 		/* ixgbe or mlx* */
 		masked = GetRSSHash(sip, dip, sp, dp) & RSS_BIT_MASK_IXGBE;
 	}
+#endif
 
+	masked = GetRSSHash(sip, dip, sp, dp) & RSS_BIT_MASK_IXGBE;
+	
 	return (masked % num_queues);
 }
 /*-------------------------------------------------------------------*/ 
