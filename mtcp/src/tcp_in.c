@@ -689,7 +689,6 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 #ifdef DBGMSG
 			DumpIPPacket(mtcp, iph, ip_len);
 #endif
-			printf(" >> Refusing SYN packet\n");
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen + 1, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -735,12 +734,10 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 		   <SEQ=SEG.ACK><CTL=RST>
 		   */
 		if (tcph->ack) {
-			printf(" >> 1. Weird packet comes.\n");
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
 		} else {
-			printf(" >> 2. Weird packet comes.\n");
 			SendTCPPacketStandalone(mtcp, 
 					iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 					0, seq + payloadlen, 0, TCP_FLAG_RST | TCP_FLAG_ACK, 
@@ -1298,7 +1295,6 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	if (tcph->rst) {
 		cur_stream->have_reset = TRUE;
 		if (cur_stream->state > TCP_ST_SYN_SENT) {
-			printf(" >> sent SYN\n");
 			if (ProcessRST(mtcp, cur_stream, ack_seq)) {
 				return TRUE;
 			}
