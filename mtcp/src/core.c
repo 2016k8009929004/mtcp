@@ -771,7 +771,6 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 
 	gettimeofday(&cur_ts, NULL);
 	TRACE_DBG("CPU %d: mtcp thread running.\n", ctx->cpu);
-	printf(" [%s] mctx: %p, mtcp: %p\n", __func__, ctx, mtcp);
 
 	ts = ts_prev = 0;
 	while ((!ctx->done || mtcp->flow_cnt) && !ctx->exit) {
@@ -794,6 +793,7 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 				pktbuf = mtcp->iom->get_rptr(mtcp->ctx, rx_inf, i, &len);
 				if (pktbuf != NULL){
 					pthread_mutex_lock(&g_mtcp_lock);
+					printf(" [%s on core %u] processing incoming packet\n", __func__, ctx->cpu);
 					ProcessPacket(mtcp, rx_inf, ts, pktbuf, len);
 					pthread_mutex_unlock(&g_mtcp_lock);
 #ifdef NETSTAT
