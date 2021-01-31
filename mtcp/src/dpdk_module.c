@@ -521,7 +521,7 @@ dpdk_get_rptr(struct mtcp_thread_context *ctxt, int ifidx, int index, uint16_t *
 
 	/* enqueue the pkt ptr in mbuf */
 	dpc->rmbufs[ifidx].m_table[index] = m;
-
+#if 0
 	/* verify checksum values from ol_flags */
 	if ((m->ol_flags & (PKT_RX_L4_CKSUM_BAD | PKT_RX_IP_CKSUM_BAD)) != 0) {
 		TRACE_ERROR("%s(%p, %d, %d): mbuf with invalid checksum: "
@@ -529,6 +529,7 @@ dpdk_get_rptr(struct mtcp_thread_context *ctxt, int ifidx, int index, uint16_t *
 			    __func__, ctxt, ifidx, index, m, m->ol_flags);
 		pktbuf = NULL;
 	}
+#endif
 #ifdef ENABLELRO
 	dpc->cur_rx_m = m;
 #endif /* ENABLELRO */
