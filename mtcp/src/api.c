@@ -710,8 +710,7 @@ mtcp_connect(mctx_t mctx, int sockid,
 	if (!mtcp) {
 		return -1;
 	}
-	printf(" [%s] on core %d\n", __func__, mctx->cpu);
-
+	
 	if (sockid < 0 || sockid >= CONFIG.max_concurrency) {
 		TRACE_API("Socket id %d out of range.\n", sockid);
 		errno = EBADF;
