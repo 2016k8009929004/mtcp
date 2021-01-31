@@ -792,10 +792,7 @@ RunMainLoop(struct mtcp_thread_context *ctx)
 			for (i = 0; i < recv_cnt; i++) {
 				pktbuf = mtcp->iom->get_rptr(mtcp->ctx, rx_inf, i, &len);
 				if (pktbuf != NULL){
-					pthread_mutex_lock(&g_mtcp_lock);
-					printf(" [%s on core %u] processing incoming packet\n", __func__, ctx->cpu);
 					ProcessPacket(mtcp, rx_inf, ts, pktbuf, len);
-					pthread_mutex_unlock(&g_mtcp_lock);
 #ifdef NETSTAT
 				} else {
 					mtcp->nstat.rx_errors[rx_inf]++;
@@ -923,7 +920,6 @@ InitializeMTCPManager(struct mtcp_thread_context* ctx)
 		return NULL;
 	}
 	g_mtcp[ctx->cpu] = mtcp;
-	pthread_mutex_init(&g_mtcp_lock, NULL);
 
 	mtcp->tcp_flow_table = CreateHashtable(HashFlow, EqualFlow, NUM_BINS_FLOWS);
 	if (!mtcp->tcp_flow_table) {
@@ -1187,7 +1183,6 @@ MTCPRunThread(void *arg)
 		TRACE_ERROR("Failed to initialize mtcp manager.\n");
 		exit(-1);
 	}
-	printf(" [%s on core %u] mtcp: %p\n", __func__, cpu, mtcp);
 
 	/* assign mtcp context's underlying I/O module */
 	mtcp->iom = current_iomodule_func;

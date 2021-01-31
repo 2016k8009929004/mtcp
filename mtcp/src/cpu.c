@@ -59,7 +59,6 @@ whichCoreID(int thread_no)
 int 
 mtcp_core_affinitize(int cpu)
 {
-	printf(" [%s on core %u] binding to core %u\n", __func__, rte_lcore_id(), cpu);
 	cpu_set_t cpus;
 	size_t n;
 	int ret;

@@ -681,9 +681,6 @@ CreateNewFlowHTEntry(mtcp_manager_t mtcp, uint32_t cur_ts, const struct iphdr *i
 	tcp_stream *cur_stream;
 	int ret; 
 
-	printf(" [%s on core %u] syn: %d, ack: %d, rst: %d\n", 
-			__func__, rte_lcore_id(), tcph->syn, tcph->ack, tcph->rst);
-	
 	if (tcph->syn && !tcph->ack) {
 		/* handle the SYN */
 		ret = FilterSYNPacket(mtcp, iph->daddr, tcph->dest);
@@ -781,7 +778,6 @@ Handle_TCP_ST_SYN_SENT (mtcp_manager_t mtcp, uint32_t cur_ts,
 		if (TCP_SEQ_LEQ(ack_seq, cur_stream->sndvar->iss) || 
 				TCP_SEQ_GT(ack_seq, cur_stream->snd_nxt)) {
 			if (!tcph->rst) {
-				printf(" [%s on core %u] filter the unacceptable acks\n", __func__, rte_lcore_id());
 				SendTCPPacketStandalone(mtcp, 
 						iph->daddr, tcph->dest, iph->saddr, tcph->source, 
 						ack_seq, 0, 0, TCP_FLAG_RST, NULL, 0, cur_ts, 0);
@@ -1260,9 +1256,6 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	s_stream.daddr = iph->saddr;
 	s_stream.dport = tcph->source;
 
-	printf(" [%s]  src ip: %x(%d), dst ip: %x(%d)\n", 
-			__func__, s_stream.saddr, s_stream.sport, s_stream.daddr, s_stream.dport);
-
 	if (!(cur_stream = StreamHTSearch(mtcp->tcp_flow_table, &s_stream))) {
 		/* not found in flow table */
 		cur_stream = CreateNewFlowHTEntry(mtcp, cur_ts, iph, ip_len, tcph, 
@@ -1303,7 +1296,6 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 	//printf(" >> update window size\n");
 	/* Process RST: process here only if state > TCP_ST_SYN_SENT */
 	if (tcph->rst) {
-		printf(" >> reset packet, state: %d\n", cur_stream->state);
 		cur_stream->have_reset = TRUE;
 		if (cur_stream->state > TCP_ST_SYN_SENT) {
 			printf(" >> sent SYN\n");
@@ -1313,7 +1305,6 @@ ProcessTCPPacket(mtcp_manager_t mtcp,
 		}
 	}
 
-	printf(" >> check stream state...\n");
 	switch (cur_stream->state) {
 	case TCP_ST_LISTEN:
 		Handle_TCP_ST_LISTEN(mtcp, cur_ts, cur_stream, tcph);
