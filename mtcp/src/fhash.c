@@ -117,7 +117,7 @@ StreamHTSearch(struct hashtable *ht, const void *it)
 	idx = ht->hashfn(item);
 
 	head = &ht->ht_table[ht->hashfn(item)];
-	printf(" [%s] HT addr: %p, index: %d, head: %p\n", __func__, ht, idx, head);
+	//printf(" [%s] HT addr: %p, index: %d, head: %p\n", __func__, ht, idx, head);
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {
 		if (ht->eqfn(walk, item)) 
 			return walk;
