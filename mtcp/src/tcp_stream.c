@@ -265,7 +265,7 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 	stream->daddr = daddr;
 	stream->dport = dport;
 
-	printf(" [%s] src ip: %x(%d), dst ip: %x(%d)\n", __func__, saddr, sport, daddr, dport);
+	//printf(" [%s] src ip: %x(%d), dst ip: %x(%d)\n", __func__, saddr, sport, daddr, dport);
 	ret = StreamHTInsert(mtcp->tcp_flow_table, stream);
 	if (ret < 0) {
 		TRACE_ERROR("Stream %d: "
@@ -274,7 +274,7 @@ CreateTCPStream(mtcp_manager_t mtcp, socket_map_t socket, int type,
 		pthread_mutex_unlock(&mtcp->ctx->flow_pool_lock);
 		return NULL;
 	}
-	printf(" [%s] Insert stream %d in to hash table succeeded\n", __func__, stream->id);
+	//printf(" [%s] Insert stream %d in to hash table succeeded\n", __func__, stream->id);
 
 #if USE_CCP
 	ret = StreamHTInsert(mtcp->tcp_sid_table, stream);
