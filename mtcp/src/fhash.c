@@ -85,7 +85,7 @@ StreamHTInsert(struct hashtable *ht, void *it)
 	idx = ht->hashfn(item);
 	assert(idx >=0 && idx < NUM_BINS_FLOWS);
 
-	printf(" [%s] HT addr: %p, index: %d, head: %p\n", __func__, ht, idx, &ht->ht_table[ht->hashfn(item)]);
+	//printf(" [%s] HT addr: %p, index: %d, head: %p\n", __func__, ht, idx, &ht->ht_table[ht->hashfn(item)]);
 	TAILQ_INSERT_TAIL(&ht->ht_table[idx], item, rcvvar->he_link);
 
 	item->ht_idx = TCP_AR_CNT;
