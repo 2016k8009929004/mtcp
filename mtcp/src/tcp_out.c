@@ -260,7 +260,7 @@ SendTCPPacket(struct mtcp_manager *mtcp, tcp_stream *cur_stream,
 	}
 	if (flags & TCP_FLAG_RST) {
 		TRACE_FIN("Stream %d: Sending RST.\n", cur_stream->id);
-		printf(" [%s] Stream %d: Sending RST.\n", __func__, cur_stream->id);
+		//printf(" [%s] Stream %d: Sending RST.\n", __func__, cur_stream->id);
 		tcph->rst = TRUE;
 	}
 	if (flags & TCP_FLAG_PSH)
@@ -617,13 +617,13 @@ SendControlPacket(mtcp_manager_t mtcp, tcp_stream *cur_stream, uint32_t cur_ts)
 
 	if (cur_stream->state == TCP_ST_SYN_SENT) {
 		/* Send SYN here */
-		printf(" [%s] sending SYN packet\n", __func__);
+		//printf(" [%s] sending SYN packet\n", __func__);
 		ret = SendTCPPacket(mtcp, cur_stream, cur_ts, TCP_FLAG_SYN, NULL, 0);
 
 	} else if (cur_stream->state == TCP_ST_SYN_RCVD) {
 		/* Send SYN/ACK here */
 		cur_stream->snd_nxt = sndvar->iss;
-		printf(" [%s] sending SYN|ACK packet\n", __func__);
+		//printf(" [%s] sending SYN|ACK packet\n", __func__);
 		ret = SendTCPPacket(mtcp, cur_stream, cur_ts, 
 				TCP_FLAG_SYN | TCP_FLAG_ACK, NULL, 0);
 
@@ -686,7 +686,7 @@ SendControlPacket(mtcp_manager_t mtcp, tcp_stream *cur_stream, uint32_t cur_ts)
 		if (sndvar->on_send_list || sndvar->on_ack_list) {
 			ret = -1;
 		} else {
-			printf(" [%s] send reset packet\n", __func__);
+			//printf(" [%s] send reset packet\n", __func__);
 			ret = SendTCPPacket(mtcp, cur_stream, cur_ts, TCP_FLAG_RST, NULL, 0);
 			if (ret >= 0) {
 				DestroyTCPStream(mtcp, cur_stream);
